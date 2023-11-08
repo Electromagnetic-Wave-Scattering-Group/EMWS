@@ -1,4 +1,4 @@
-# Electromagnetic Wave Scattering
+# Electromagnetic Wave Scattering 
 Developers: [Noah Templet](https://github.com/w3aseL); [Michael Sheppard III](https://github.com/MilsonCodes); [James Carter](https://github.com/JacobACarter); [Joel  Keller](https://github.com/joelkeller31)\
 Research Supervisor: [Stephen Shipman](https://www.math.lsu.edu/~shipman)
 
