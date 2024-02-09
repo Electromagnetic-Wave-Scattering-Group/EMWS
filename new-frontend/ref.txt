@@ -1,0 +1,234 @@
+<template>
+  <h1>{{ msg }}</h1>
+  <div class="card">
+    <h3 v-if="!layer.num">Please Input the Number of Layers</h3>
+    <p>Number of Layers: {{ layer.num }}</p>
+    <input v-model="layer.num" placeholder="3" />
+  </div>
+     
+    <div v-if="layer.num"> Please Input Epsilon and Mu parameters for the layers
+
+  <div v-for="n in parseInt(layer.num)" :key="n">
+    <b-container class="bv-example-row bv-example-row-flex-cols">
+    <h2> Epsilon Layer {{ n }}</h2>
+    <div>
+  <b-row>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon" placeholder="1" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon"  placeholder="2" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon"  placeholder="3" />
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon"  placeholder="1" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon" placeholder="2" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon"  placeholder="3" />
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon"  placeholder="1" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon"  placeholder="2" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.layers[n-1].epsilon"  placeholder="3" />
+    </b-col>
+  </b-row>
+</div>
+
+</b-container>
+<b-container class="bv-example-row bv-example-row-flex-cols">
+    <h2> Mu Layer {{ n }}</h2>
+  <b-row >
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="1" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="2" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="3" />
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="1" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="2" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="3" />
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="1" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="2" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.layers[n-1].mu" placeholder="3" />
+    </b-col>
+  </b-row>
+</b-container>
+
+
+
+
+
+
+<!-- <b-row>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="1" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="2" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="3" />
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="1" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="2" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="3" />
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="1" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="2" />
+    </b-col>
+    <b-col>
+      <input v-model="layer.epsilon" placeholder="3" />
+    </b-col>
+  </b-row>
+</div>
+
+</b-container>
+<b-container class="bv-example-row bv-example-row-flex-cols">
+    <h2> Mu Layer {{ n }}</h2>
+  <b-row >
+    <b-col >
+      <input v-model="layer.mu" placeholder="1" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.mu" placeholder="2" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.mu" placeholder="3" />
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col >
+      <input v-model="layer.mu" placeholder="1" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.mu" placeholder="2" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.mu" placeholder="3" />
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col >
+      <input v-model="layer.mu" placeholder="1" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.mu" placeholder="2" />
+    </b-col>
+    <b-col >
+      <input v-model="layer.mu" placeholder="3" />
+    </b-col>
+  </b-row> -->
+
+
+
+
+  <script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useCounterStore } from '@/store/counter'
+
+
+const counterStore = useCounterStore()
+
+defineProps<{ msg: string }>()
+
+const layer = ref({
+  num: null,
+  layers: [
+    {
+      epsilon: [
+        [null, null, null],
+        [null, null, null],
+        [null, null, null],
+      ],
+      mu: [
+        [null, null, null],
+        [null, null, null],
+        [null, null, null],
+      ],
+      length: 10,
+    },
+  ],
+});
+const isSubmitted = ref(false)
+
+const handleSubmit = () => {
+  // Perform any necessary actions with the submitted data
+  console.log('Submitted Data:', layer)
+  
+  // Set the flag to indicate that the form has been submitted
+  isSubmitted.value = true
+}
+
+</script>
+
+<template>
+  <h1>{{ msg }}</h1>
+  <div class="card">
+    <h3 v-if="!layer.num">Please Input the Number of Layers</h3>
+    <p>Number of Layers: {{ layer.num }}</p>
+    <input v-model="layer.num" placeholder="3" />
+  </div>
+     
+  <div v-if="layer.num"> Please Input Epsilon and Mu parameters for the layers
+
+  <div v-for="n in parseInt(layer.num)" :key="n"> 
+    <b-container>
+      <h3>Please Enter Layer {{ n }} length</h3>
+      <input v-model="layer.layers.length" placeholder="Layer length" /> 
+    </b-container> 
+</div>
+</div>
+<button @click="handleSubmit" class="btn btn-primary"> Submit</button> 
+
+
+<!-- <div >
+<v-for n in layer.num> 
+
+</v-for>
+  </div> -->
+  <!-- <button type="submit" class="btn btn-primary"> Finalize Parameters</button> -->
+
+</template>
