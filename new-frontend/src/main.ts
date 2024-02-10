@@ -11,4 +11,24 @@ const i18n = createI18n({
   messages
 })
 
-createApp(App).use(store).use(router).use(i18n).mount('#app')
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import '@fortawesome/fontawesome-free/css/all.css' 
+import { aliases, fa } from 'vuetify/iconsets/fa'
+import PrimeVue from 'primevue/config';
+
+const vuetify = createVuetify({
+  components,
+  directives,
+  icons: {
+    defaultSet: 'fa',
+    aliases,
+    sets: {
+      fa,
+    },
+  }
+}) 
+
+createApp(App).use(store).use(router).use(vuetify).use(PrimeVue).use(i18n).mount('#app')

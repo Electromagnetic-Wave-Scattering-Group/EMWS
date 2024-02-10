@@ -11,7 +11,9 @@ const showCheckboxes = ref(false);
 const selectedModes = ref([]);
 const showCoefficients = ref(false);
 const coefficients = ref([null, null, null, null]);
-const showResults = ref(false);
+const formSubmitted = ref(false);
+const experiments = ref(['Scattering Experiment', 'Transmission Experiment', 'Faraday Roration'])
+const selected = ref('')
 
 const calcModes = () => {
   // this is where an api call would take place and return calculated modes (first and last layer eigenvalues)
@@ -41,99 +43,92 @@ const saveSelectedModes = () => {
   showCoefficients.value = true;
 };
 
-const runExperiment = () => {
-  // Again, this would send the coeffecients to the backend for the experiment
-  console.log('Experiment Coefficients:', coefficients.value);
+const submitForm = () => {
+    formSubmitted.value = true
+}
 
-  // once results come back we would show the div containing the graph
-  showResults.value = true;
-};
 </script>
 
 <template>
 
+<v-container class="bg-surface-variant">
+    <v-row no-gutters>
+    <v-col >
+      Please Input Parameters for the Signal
+        <v-form @submit.prevent>
+          <v-text-field
+            v-model="k1"
+            label="k1">
+          </v-text-field>
+          <v-text-field
+            v-model="k2"
+            label="k2">
+          </v-text-field>
+          <v-text-field
+            v-model="frequency"
+            label="w">
+          </v-text-field>
+        
+      </v-form>
+    </v-col > 
 
-<div class="flex-container" >
-
-  <div class="flex-child magenta">
-    <h2>Please Input Frequency and Wavenumber</h2>
-    <p>Frequency: {{ frequency }}</p>
-    <input v-model="frequency" placeholder="w" />
-    <p>Wavevector-X: {{ k1 }}</p>
-    <input v-model="k1" placeholder="k1" />
-    <p>Wavevector-Y: {{ k2 }}</p>
-    <input v-model="k2" placeholder="k2" />
-  <div class="button-padding">
-    <button @click="finalizeParameters" class="btn btn-primary"> Finalize Parameters</button>
-
-  </div>
-  </div>
-
-  <div class="flex-child green">
-    <div v-if="showCheckboxes">
-    <h2>Select Modes</h2>
-
-    <!-- Split modes into two columns -->
-    <div class="checkbox-columns">
-      <div v-for="(mode, index) in modes" :key="mode" :class="{'column-1': index < 4, 'column-2': index >= 4}">
-        <label>
-          <input type="checkbox" v-model="selectedModes" :value="mode" />
-          {{ mode }}
-        </label>
-      </div>
-    </div>
-    <div class="button-padding">
-
-      <button @click="saveSelectedModes" class="btn btn-primary"> Save Selected Modes</button>
-
-    </div>
-  </div>
-
-  </div>
-
-  <div class="flex-child blue">
-    <div v-if="showCoefficients">
-    <h2>Coefficients</h2>
-
-    <!-- Apply coefficients-columns class for styling -->
-    <div class="coefficients-columns">
-      <!-- First row -->
-      <div class="coefficient-row">
-        <div v-for="(coefficient, index) in coefficients.slice(0, 2)" :key="index">
-          <input v-model="coefficients[index]" :placeholder="'C ' + (index + 1)" />
-        </div>
-      </div>
-
-      <!-- Second row -->
-      <div class="coefficient-row">
-        <div v-for="(coefficient, index) in coefficients.slice(2)" :key="index">
-          <input v-model="coefficients[index + 2]" :placeholder="'C ' + (index + 3)" />
-        </div>
-      </div>
-    </div>
+    <v-col>
+      Please Select Your Modes
+      <v-row>
+        <v-col>
+            <v-checkbox v-for="(mode, index) in modes.slice(0, 4)" :key="index"
+              v-model="selectedModes"
+              :label="`${mode}`"
+              :value="mode"
+            ></v-checkbox>
+          </v-col>
+          <v-col>
+            <v-checkbox v-for="(mode, index) in modes.slice(4, 8)" :key="index"
+              v-model="selectedModes"
+              :label="`${mode}`"
+              :value="mode"
+            ></v-checkbox>
+          </v-col>
+      </v-row>
+    </v-col>
+    <v-col>
+      Please Select Coeffecients
+      <v-row>
+        <v-col>
+          <v-text-field v-for="(coeff, index) in coefficients.slice(0, 2)" :key="index"
+              v-model="coefficients[index]"
+              :label="`C ${index+1}`"
+              >
+          </v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field v-for="(coeff, index) in coefficients.slice(2,4)" :key="index"
+              v-model="coefficients[index+2]"
+              :label="`C ${index + 3}`"
+              >
+          </v-text-field>
+        </v-col>
+      </v-row>
+      Please Select Your Experiment 
+      <v-row>
+        <v-combobox
+        label="Experiments"
+        :items="experiments"
+        v-model="selected"
+        ></v-combobox>
+      </v-row>
+      <v-btn @click="submitForm" block class="mt-2">Submit</v-btn>
+    </v-col>
+  </v-row>
 
 
-    <h2> Please Select Your Experiment </h2>
 
-    <div>
-      there should be a dropdown here 
-      <b-dropdown> 
-        here is some text
-      </b-dropdown>
-    </div>
 
-    <!-- Button with padding -->
-    <div class="button-padding">
-      <button @click="runExperiment" class="btn btn-primary"> Run Experiment</button>
-    </div>
-  </div>
+  </v-container>
 
-  </div>
+  <v-container v-if="formSubmitted" class="bg-surface-variant">
+    <v-row> Experiment: {{ selected }} </v-row>
+    <v-row justify="center"> Results would display here</v-row>
+  </v-container>
 
-</div>
-
-<div v-if="showResults" style="width: 100%; padding-above: 20px; border: 1px solid #ddd; ">
-  <h2>E and H components at Initial time</h2>
-  <h3>Graph of results would display here</h3>
-</div>
 </template>

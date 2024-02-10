@@ -9,15 +9,15 @@ defineProps<{ msg: string }>()
 // I want a better data model
 const layer = ref({
   // number of layers to add
-  num: null, 
+  num: 10, 
   // store each individual layer object
   layers: [
     {
       // layer's epsilon
       epsilon: [
-        [null, null, null],
-        [null, null, null],
-        [null, null, null],
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
       ],
       // layer's mu
       mu: [
@@ -45,45 +45,39 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
-  <div class="card">
-    <h3 v-if="!layer.num">Please Input the Number of Layers</h3>
-    <p>Number of Layers: {{ layer.num }}</p>
-    <input v-model="layer.num" placeholder="3" />
-  </div>
-     
-  <div v-if="layer.num"> Please Input Epsilon and Mu parameters for the layers
+<v-container class="bg-surface-variant">
+        Please Input The Number of Layers for the Experiment
 
-  <div v-for="n in parseInt(layer.num)" :key="n"> 
-    <b-container>
-      <h3>Please Enter Layer {{ n }} length</h3>
-      
-      <!-- <input v-model="layer.layers[n-1].length" placeholder="Layer length" />  -->
-      
-      
-      <h3>Please Enter Layer {{ n }} Epsilon</h3>
-      <!-- <div v-for="(row, rowIndex) in layer.layers[n-1].epsilon" :key="rowIndex">
-        <div v-for="(value, colIndex) in row" :key="colIndex">
-          <input v-model="layer.layers[n-1].epsilon[rowIndex][colIndex]" :placeholder="'Epsilon ' + (rowIndex + 1) + 'x' + (colIndex + 1)" />
-        </div>
-      </div> -->
-  
-      <h3>Please Enter Layer {{ n }} Mu</h3>
-      <!-- <div v-for="(row, rowIndex) in layer.layers[n-1].mu" :key="rowIndex">
-        <div v-for="(value, colIndex) in row" :key="colIndex">
-          <input v-model="layer.layers[n-1].mu[rowIndex][colIndex]" :placeholder="'Mu ' + (rowIndex + 1) + 'x' + (colIndex + 1)" />
-        </div>
-      </div> -->
+    <v-row no-gutters justify="center">
+      <input type="number" v-model="layer.num">
+    </v-row>
+  </v-container>
 
-    <!-- Would ideally be:  <input v-model="layer.layers[n-1].length" placeholder="Layer length" />  -->
-      <!-- <input v-model="layer.layers.length" placeholder="Layer length" />  -->
+  <v-container class="bg-surface-variant">
+  <v-row>
+    <v-col v-for="n in layer.num">
+      <v-row>
+        Layer {{ n }} Parameters 
+      </v-row>
+      <v-row justify="center">
+        Length
+      </v-row>
+      <v-row>
+        <input type="number" v-model="layer.layers.length">
+      </v-row>
+
+      <v-row>
+        Epsilon
+      </v-row>'
 
 
+      <v-row>
+        Mu
+      </v-row>
+
+    </v-col>
+
+  </v-row>  
     
-    </b-container> 
-</div>
-</div>
-<button @click="handleSubmit" class="btn btn-primary"> Submit</button> 
-
-
+  </v-container>
 </template>
