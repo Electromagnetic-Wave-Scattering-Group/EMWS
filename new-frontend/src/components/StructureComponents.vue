@@ -1,83 +1,93 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useCounterStore } from '@/store/counter'
 
 
-const counterStore = useCounterStore()
+import { structureStore } from '@/store/structure'
+const structStore = structureStore()
 
 defineProps<{ msg: string }>()
-// I want a better data model
-const layer = ref({
-  // number of layers to add
-  num: 10, 
-  // store each individual layer object
-  layers: [
-    {
-      // layer's epsilon
-      epsilon: [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-      ],
-      // layer's mu
-      mu: [
-        [null, null, null],
-        [null, null, null],
-        [null, null, null],
-      ],
-      // layer's length 
-      length: 10,
-    },
-    // issue is: I can't seem to find a way to have the number of layer objects update for each layer added
-  ],
-});
 
-const isSubmitted = ref(false)
+const num = ref(0);
+const dynamicStructureRef = ref();
+let readyToFinalize = ref(false)
+// Computed property to make dynamicStructure accessible in the template
+const dynamicStructure = computed(() => dynamicStructureRef.value);
 
-const handleSubmit = () => {
-  // Perform any necessary actions with the submitted data
-  console.log('Submitted Data:', layer)
-  
-  // Set the flag to indicate that the form has been submitted
-  isSubmitted.value = true
-}
+const onBuildStruct = () => {
+  const layerDataArray = [];
+
+  for (let i = 1; i <= num.value; i++) {
+    const layerData = {
+      length: Number, 
+      epsilon: Array.from({ length: 9 }, () => 0), // Modify as needed
+      mu: Array.from({ length: 9 }, () => 0),      // Modify as needed
+    };
+    layerDataArray.push(layerData);
+  }
+
+  // Call buildStruct and get the returned object
+  const { dynamicStructure } = structStore.buildStruct(num.value, layerDataArray);
+  readyToFinalize.value = true;
+
+  // Assign to the ref so it can be reactive in the template
+  dynamicStructureRef.value = dynamicStructure;
+};
+
+const finalizeStruct = () => {
+  // Check if dynamicStructure is not null before finalizing
+  if (dynamicStructureRef.value) {
+    // Update the store with the current dynamicStructure data
+    structStore.updateDynamicStructure(dynamicStructureRef.value);
+  }
+};
+
 
 </script>
 
 <template>
-<v-container class="bg-surface-variant">
-        Please Input The Number of Layers for the Experiment
-
-    <v-row no-gutters justify="center">
-      <input type="number" v-model="layer.num">
-    </v-row>
-  </v-container>
-
   <v-container class="bg-surface-variant">
-  <v-row>
-    <v-col v-for="n in layer.num">
-      <v-row>
-        Layer {{ n }} Parameters 
+    Please Input The Number of Layers for the Experiment
+    <v-form @submit.prevent>
+      <v-text-field v-model="num" label="Number of Layers" type="number"></v-text-field>
+      <v-btn @click="onBuildStruct" block class="mt-2">Set Number of Layers</v-btn>
+    </v-form>
+
+    <v-container v-if="dynamicStructure">
+      <v-row v-for="(layer, index) in dynamicStructure.data" :key="index">
+        <v-col>
+          <v-row>
+            Layer {{ index + 1 }} Parameters
+          </v-row>
+            <v-row> 
+              <v-text-field
+                v-model="layer.length"
+                :label="`Layer ${index + 1} Length`"
+                type="number"
+              ></v-text-field>
+            </v-row>
+          <v-row v-for="i in 3" :key="i">
+            
+            <v-col v-for="j in 3" :key="j">
+              <v-text-field
+                v-model="layer.epsilon[(i - 1) * 3 + j - 1]"
+                :label="`Epsilon ${(i - 1) * 3 + j }`"
+                type="number"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row v-for="i in 3" :key="i">
+            <v-col v-for="j in 3" :key="j">
+              <v-text-field
+                v-model="layer.mu[(i - 1) * 3 + j - 1]"
+                :label="`Mu ${(i - 1) * 3 + j }`"
+                type="number"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-col>
       </v-row>
-      <v-row justify="center">
-        Length
-      </v-row>
-      <v-row>
-        <input type="number" v-model="layer.layers.length">
-      </v-row>
+    </v-container>
+    <v-btn v-if="readyToFinalize" @click="finalizeStruct" block class="mt-2">Finalize Structure</v-btn>
 
-      <v-row>
-        Epsilon
-      </v-row>'
-
-
-      <v-row>
-        Mu
-      </v-row>
-
-    </v-col>
-
-  </v-row>  
-    
   </v-container>
 </template>

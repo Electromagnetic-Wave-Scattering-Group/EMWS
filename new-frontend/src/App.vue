@@ -1,8 +1,8 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
+    <!-- <router-link to="/">Home</router-link> |
     <router-link to="/compositionapi">Composition API Example</router-link> |
-    <router-link to="/optionsapi">Options API Example</router-link> |
+    <router-link to="/optionsapi">Options API Example</router-link> | -->
     <router-link to="/about">About</router-link>  |
     <router-link to="/structure">Structure</router-link>  |
     <router-link to="/emws">Signal Parameters</router-link>
