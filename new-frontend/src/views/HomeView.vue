@@ -1,17 +1,26 @@
 <template>
   <div class="home">
-    <h1>{{ $t('welcome') }}</h1>
-    <p>
-      Check out
-      <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank">create-vue</a>, the
-      official Vue + Vite starter
+    <h1>{{ $t('Welcome to the EMWS GUI!') }}</h1>
+
+    <v-card class ="heading-3"  variant="tonal">
+      <p class="font-weight-black">
+      This is a functional GUI for simulating EM Waves in layered media
     </p>
-    <p>
-      Install
-      <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-      in your IDE for a better DX
+    </v-card>
+
+    <v-card text= "Unsure of what that means? Click the 'Theory' tab" variant="tonal"></v-card>
+
+    <div class="mt-4 text-subtitle-2"></div>
+
+
+    <v-card class ="heading-3"  variant="tonal">
+      <p class="font-weight-black">
+      This project is part of a colloboration among EM Reseachers
     </p>
-    <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
+    </v-card>
+
+    <v-card text= "Want to learn more about the EMWS Research Group? Click the 'About' Tab" variant="tonal"></v-card>
+    
   </div>
 </template>
 

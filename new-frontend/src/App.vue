@@ -4,8 +4,9 @@
     <router-link to="/compositionapi">Composition API Example</router-link> |
     <router-link to="/optionsapi">Options API Example</router-link> | -->
     <router-link to="/about">About</router-link>  |
+    <router-link to="/theory">Theory</router-link>  |
     <router-link to="/structure">Structure</router-link>  |
-    <router-link to="/emws">Signal Parameters</router-link>
+    <router-link to="/emws">Experiments</router-link>
 
   </nav>
   <router-view />

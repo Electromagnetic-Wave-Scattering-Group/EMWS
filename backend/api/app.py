@@ -152,6 +152,186 @@ def decode_constants(m):
 
     return n
 
+
+
+@app.route('/structure/test', methods=['POST'])
+@cross_origin()
+def bar():
+    req = json.loads(request.data)
+    omega = float(req['omega'])
+    k1 = float(req['k1'])
+    k2 = float(req['k2'])
+    layers = req['layers']['data']
+    num = int(req['layers']['num'])
+    struct = s(num, omega, k1, k2)
+
+    for layer in layers: 
+        epsilon = np.array(layer['epsilon']).astype(float).reshape(3,3)
+        mu = np.array(layer['mu']).astype(float).reshape(3,3)
+        struct.addLayer(layer['name'], int(layer['length']), epsilon, mu)
+
+    struct.buildMatrices()
+    struct.calcEig()
+    struct.calcModes()
+
+    # # Create list of values for response
+    maxwells = []
+    e_vals = []
+    e_vecs = []
+    modes = []
+    i = 0
+    for layer in struct.layers:
+        m = encode_maxwell(struct.maxwell[i])
+        n = encode_eigen(layer.eigVal.tolist())
+        o = encode_evecs(layer.eigVec.tolist())
+        mm = encode_evecs(layer.mode.tolist())
+
+
+        maxwells.append(m)
+        e_vals.append(n)
+        e_vecs.append(o)
+        modes.append(mm)
+        i += 1
+
+    # Prepare response data
+    data = {
+        'maxwell_matrices': maxwells,
+        'eigenvalues': e_vals,
+        'eigenvectors': e_vecs,
+        'modes': modes
+    }
+        
+    return data
+
+def swapArrayIndices(a, i, j):
+    a[i], a[j] = a[j], a[i]
+    return a
+
+# def swapMatrixColumns(a, i, j):
+#     # print('Matrix Before Swap: ', a)
+#     a[:, i], a[:, j] = a[:,j], a[:, i]
+
+#     # a[:,[i][j]] = a[:,[j],[i]]
+#     # print('Matrix After Swap: ', a)
+#     return a
+
+def orderEigs(eigenvalues, eigenvectors, selected, n): 
+    # first set 
+
+    for value in eigenvalues[0]: 
+        # print(value)
+        if value == selected[0]: 
+            index = eigenvalues[0].index(value)
+            swapArrayIndices(eigenvalues[0], index, 0)
+            swapArrayIndices(eigenvectors[0], index, 0)
+
+        if value == selected[1]: 
+            index = eigenvalues[0].index(value)
+
+            # # index = eigenvalues[0].index(value)
+            # eigenvalues[0][3] = eigenvalues[0][1]
+            # eigenvalues[0][1] = value
+            swapArrayIndices(eigenvalues[0], index, 1)
+            swapArrayIndices(eigenvectors[0], index, 1)
+
+        else: 
+            pass 
+    for value in eigenvalues[n-1]:        
+        if value == selected[2]: 
+            index = eigenvalues[n-1].index(value)
+            swapArrayIndices(eigenvalues[n-1], index, 2)
+            swapArrayIndices(eigenvectors[n-1], index, 2)
+
+        if value == selected[3]: 
+            index = eigenvalues[n-1].index(value)
+            swapArrayIndices(eigenvalues[n-1], index, 3)
+            swapArrayIndices(eigenvectors[n-1], index, 3)
+        else: 
+            pass 
+
+    return eigenvalues, eigenvectors
+    
+
+@app.route('/structure/testfield', methods=['POST'])
+@cross_origin()
+def testfield():
+    assert request.method == 'POST'
+    # print('Field route beginning')
+    req = json.loads(request.data)
+    omega = float(req['omega'])
+    k1 = float(req['k1'])
+    k2 = float(req['k2'])
+    layers = req['layers']['data']
+    num = int(req['layers']['num'])
+    selected = req['selected_modes']
+    maxwell_matrices = req['maxwell_matrices']
+    eigenvalues = req['eigenvalues']
+    eigenvectors = req['eigenvectors']
+    incoming = req['incoming']
+    struct = s(num, omega, k1, k2)
+
+
+
+
+    for layer in layers: 
+        epsilon = np.array(layer['epsilon']).astype(float).reshape(3,3)
+        mu = np.array(layer['mu']).astype(float).reshape(3,3)
+        struct.addLayer(layer['name'], int(layer['length']), epsilon, mu)
+    
+
+        #print('\nFailed to load eigen system. Will calculate data')
+
+
+    # # # Handle maxwells
+
+    if maxwell_matrices == []:
+        struct.buildMatrices()
+        maxwells = []
+        for maxwell in struct.maxwell:
+            m = encode_maxwell(maxwell)
+            maxwells.append(m)
+    else:
+        maxwells = []
+        for maxwell in maxwell_matrices:
+            maxwells.append(decode_maxwell(maxwell))
+        struct.importMatrices(maxwells)
+    
+    # #Handle eigendata
+    if eigenvalues == [] or eigenvectors == []:
+        raise ValueError('Need to calculate and select modes for experiment')
+
+
+    else:
+        e_vals = []
+        e_vecs = []
+        vals, vecs = orderEigs(eigenvalues, eigenvectors, selected, num)
+
+        for val in vals:
+            e_vals.append(decode_eigen(val))
+        for vec in vecs:
+            e_vecs.append(decode_evecs(vec))
+
+            # e_vecs.append(decode_eigen(vec))
+        
+    #     print(e_vals[0])
+        struct.importEig(e_vals, e_vecs)
+
+    if incoming == []:
+        raise ValueError('Need to provide coeffecients for the experiment')
+    else: 
+        incoming = decode_eigen(req['incoming'])
+
+
+    struct.calcScattering()
+    struct.calcConstants(incoming[0], incoming[1], incoming[2], incoming[3])
+    
+
+    num_points = 200
+
+    field = struct.determineField(num_points)
+
+    return field
+
 # Route for creating a crystal structure and calculating eigen problem
 @app.route('/structure/modes', methods=['POST'])
 @cross_origin()

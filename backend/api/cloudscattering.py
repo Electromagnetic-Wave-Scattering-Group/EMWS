@@ -202,6 +202,7 @@ class Structure:
         self.k2 = k2/self.kap
         self.layers = []
         self.transferMatrices = []
+        
 
     def printLayers(self):
         print('\nLAYERS: ')
@@ -234,12 +235,16 @@ class Structure:
             print('\nBuilding Maxwell')
         maxwell_matrices = []
         for layer in self.layers:
+            
             e = layer.epsilon
             u = layer.mu
-            k1 = self.k1
-            k2 = self.k2
+            k1 = float(self.k1)
+            k2 = float(self.k2)
+            w = float(self.omega)
+
             imaginary = complex(0, 1)
-            omega = self.omega * imaginary
+            omega = w * imaginary
+
             m11 = omega * (-(e[2][0]*k1/e[2][2]) - (k2*u[1][2]/u[2][2]))
             m12 = omega * (-(e[2][1]*k1/e[2][2]) + (k1*u[1][2]/u[2][2]))
             m13 = omega * ((k1*k2/e[2][2]) + u[1][0] -
@@ -308,11 +313,13 @@ class Structure:
         if (DEBUG):
             print('\nImporting previously created eigendata')
         for n in range(len(self.layers)):
+            print(n)
             if(DEBUG):
                 print(f'Eigenvalue array {n}:\n{e_vals[n]}')
                 print(f'Eigenvector array {n}:\n{e_vecs[n]}')
             self.layers[n].eigVal = e_vals[n]
             self.layers[n].eigVec = e_vecs[n]
+ 
 
     def debugEigV(self):
         vectors = []
@@ -385,6 +392,8 @@ class Structure:
 
 
         for i in range(I):
+
+            print(self.layers[i].eigVal)
             expVecLeft = np.exp((self.layers[i].eigVal * (interfaces[i] - references[i])))
             expVecRight = np.exp((self.layers[i+1].eigVal * (interfaces[i] - references[i+1])))
             if(DEBUG):
@@ -462,13 +471,13 @@ class Structure:
             c[i+2] = cPrime[i]
 
         self.constants = c
-        for i in range(self.num):
-            currentConst =  np.transpose(c[i:i+4])
-            layerMode = np.array(self.layers[i].mode)
-            #     # Set solution equal to the mode times the constant
-            sol = layerMode.dot(currentConst)
-            # # Store solution in the structure layer
-            self.layers[i].solution = sol
+        # for i in range(self.num):
+        #     currentConst =  np.transpose(c[i:i+4])
+        #     layerMode = np.array(self.layers[i].mode)
+        #     #     # Set solution equal to the mode times the constant
+        #     sol = layerMode.dot(currentConst)
+        #     # # Store solution in the structure layer
+        #     self.layers[i].solution = sol
 
         return c 
 
@@ -589,12 +598,11 @@ class Structure:
                 z = z_ends[layer] + (i * length) / num_points
 
                 piScalar = np.pi * 0.4
-
                 scalar = np.exp(np.multiply(complex(0.0, 1.0), piScalar))
                 scalarMat = np.multiply(scalar, self.layers[layer].eigVec)
                 expDiag = np.diag(np.exp(np.multiply(self.layers[layer].eigVal, (z - references[layer]))))
                 expMat = np.matmul(scalarMat, expDiag)
-                fieldVec = np.matmul(expMat, current_c)
+                fieldVec = np.matmul(expMat, current_c) 
 
 
 
@@ -609,7 +617,6 @@ class Structure:
 
 
 
-
         field = {
             'z': z_arr,
             'Ex': Ex,
@@ -620,11 +627,12 @@ class Structure:
             'Hz': Hz
         }
 
-        self.field = field
-        i1 = [self.determineFieldAtSpecificPointInLayer(0, 0), self.determineFieldAtSpecificPointInLayer(0, 1)]
-        i2 = [self.determineFieldAtSpecificPointInLayer(7, 1), self.determineFieldAtSpecificPointInLayer(7, 2)]
+        # self.field = field
+        # i1 = [self.determineFieldAtSpecificPointInLayer(0, 0), self.determineFieldAtSpecificPointInLayer(0, 1)]
+        # i2 = [self.determineFieldAtSpecificPointInLayer(7, 1), self.determineFieldAtSpecificPointInLayer(7, 2)]
 
         return field
+        
     
 
     

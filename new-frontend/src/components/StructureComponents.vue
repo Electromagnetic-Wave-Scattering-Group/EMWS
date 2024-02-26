@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-
-import { structureStore } from '@/store/structure'
-const structStore = structureStore()
+import { paramStore } from '@/store/emws'
+const structStore = paramStore()
 
 defineProps<{ msg: string }>()
 
@@ -18,9 +17,11 @@ const onBuildStruct = () => {
 
   for (let i = 1; i <= num.value; i++) {
     const layerData = {
-      length: Number, 
-      epsilon: Array.from({ length: 9 }, () => 0), // Modify as needed
-      mu: Array.from({ length: 9 }, () => 0),      // Modify as needed
+      name: 'layer ' + (i + 1),
+      // length: Number, 
+      length: i+2,
+      epsilon: Array.from({ length: 9 }, () => 1), // Length 9 array
+      mu: Array.from({ length: 9 }, () => 1),      // Length 9 array
     };
     layerDataArray.push(layerData);
   }
@@ -88,6 +89,5 @@ const finalizeStruct = () => {
       </v-row>
     </v-container>
     <v-btn v-if="readyToFinalize" @click="finalizeStruct" block class="mt-2">Finalize Structure</v-btn>
-
   </v-container>
 </template>

@@ -3,6 +3,7 @@ import '@/style.css'
 import App from '@/App.vue'
 import router from '@/router'
 import store from '@/store'
+import { paramStore } from '@/store/emws';
 import { createI18n } from 'vue-i18n'
 import messages from '@intlify/unplugin-vue-i18n/messages'
 
@@ -18,6 +19,10 @@ import * as directives from 'vuetify/directives'
 import '@fortawesome/fontawesome-free/css/all.css' 
 import { aliases, fa } from 'vuetify/iconsets/fa'
 import PrimeVue from 'primevue/config';
+import VueApexCharts from "vue3-apexcharts";
+
+
+
 
 const vuetify = createVuetify({
   components,
@@ -31,4 +36,4 @@ const vuetify = createVuetify({
   }
 }) 
 
-createApp(App).use(store).use(router).use(vuetify).use(PrimeVue).use(i18n).mount('#app')
+createApp(App).use(store).use(router).use(vuetify).use(PrimeVue).use(VueApexCharts).use(i18n).mount('#app')

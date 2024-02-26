@@ -8,6 +8,8 @@ import { ref, computed } from 'vue'
     }
 
 export const structureStore = defineStore('structure', () => {
+    
+    // declare a state variable where we will store the number of layers and the corresponding layer data
     const state = {
         layerNum: 0,
         dynamicStructure: null as DynamicDataStructure<number> | null,
@@ -27,12 +29,13 @@ export const structureStore = defineStore('structure', () => {
         return { dynamicStructure, layerNum };
       }
       
-      const getDynamicStructure = () => state.dynamicStructure;
+        const getDynamicStructure = () => state.dynamicStructure;
 
         const updateDynamicStructure = (dynamicStructure: DynamicDataStructure<number>) => {
             state.dynamicStructure = dynamicStructure;
             console.log(dynamicStructure)
         };
+        
 
       return { state, buildStruct, getDynamicStructure, updateDynamicStructure};
     })
