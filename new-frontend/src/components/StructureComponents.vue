@@ -20,8 +20,8 @@ const onBuildStruct = () => {
       name: 'layer ' + (i + 1),
       // length: Number, 
       length: i+2,
-      epsilon: Array.from({ length: 9 }, () => 1), // Length 9 array
-      mu: Array.from({ length: 9 }, () => 1),      // Length 9 array
+      epsilon: Array.from({ length: 9 }, () => Math.random()), // Length 9 array
+      mu: Array.from({ length: 9 }, () => Math.random()),      // Length 9 array
     };
     layerDataArray.push(layerData);
   }

@@ -390,28 +390,15 @@ class Structure:
             else:
                 interfaces[i] = ifaces[i+1]
 
-
         for i in range(I):
 
-            print(self.layers[i].eigVal)
             expVecLeft = np.exp((self.layers[i].eigVal * (interfaces[i] - references[i])))
             expVecRight = np.exp((self.layers[i+1].eigVal * (interfaces[i] - references[i+1])))
-            if(DEBUG):
-                print('expVecLeft:')
-                print(expVecLeft)
-                print('expVecRight:')
-                print(expVecRight)
+
             
             leftPsi[i] = np.dot(self.layers[i].eigVec, np.diag(expVecLeft))
             rightPsi[i] = np.dot(self.layers[i+1].eigVec, np.diag(expVecRight))
 
-
-
-        if(DEBUG):
-            print('leftPsi: ')
-            print(leftPsi)
-            print('rightPsi: ')
-            print(rightPsi)
         for inter in range_at_1(I):
             for i in range_at_1(4):
                 for j in range_at_1(4):
@@ -420,14 +407,6 @@ class Structure:
                     valj2 = 4 * inter + j - 1
                     s[vali][valj] = leftPsi[inter-1].item(i-1,j-1)
                     s[vali][valj2] = np.negative(rightPsi[inter-1].item(i-1,j-1))
-
-        if(DEBUG):
-            print('Scattering matrix')
-            print(s.shape)
-            print(s[0:4])
-            print(s[4:8])
-            # print(s)
-            print("\n")
 
         self.scattering = s
         return s

@@ -192,17 +192,21 @@ const chartOptions = ref({
             type="number">
           </v-text-field>
           <v-text-field
-            v-model="frequencyStart"
+            v-model="parameterStore.frequencyLeft"
             label="wLeft"
             type="number">
           </v-text-field>
           <v-text-field
-            v-model="frequencyEnd"
+            v-model="parameterStore.frequencyRight"
             label="wLeft"
             type="number">
           </v-text-field>
-          <v-btn block class="mt-2">Calculate Modes</v-btn >
-          
+          <v-text-field
+            v-model="parameterStore.points"
+            label="points"
+            type="number">
+          </v-text-field>
+          <v-btn block class="mt-2" @click="parameterStore.setRangeOfModes">Calculate Modes</v-btn >
       </v-form>
     </v-col > 
     <v-col>
@@ -251,10 +255,10 @@ const chartOptions = ref({
   </v-row>
 
 </v-container>
-  <v-container class="bg-surface-variant" v-if="parameterStore.shouldRender">
+  <!-- <v-container class="bg-surface-variant" v-if="parameterStore.shouldRender">
     <div id="chart">
       <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>    </div>
-  </v-container>
+  </v-container> -->
 
 
 

@@ -38,6 +38,43 @@ export function calculateModes() {
   });
 }
 
+export function calculateRangeOfModes() {
+  const parameterStore = paramStore();
+  const frequencyLeft = parameterStore.frequencyLeft;
+  const frequencyRight = parameterStore.frequencyRight;
+  const k1 = parameterStore.k1;
+  const k2 = parameterStore.k1;
+  const layers = parameterStore.state.dynamicStructure
+  const points = parameterStore.points
+
+
+  const post = {
+    'frequencyLeft': frequencyLeft, 
+    'frequencyRight': frequencyRight, 
+    'k1': k1, 
+    'k2': k2, 
+    'layers': layers, 
+    'points': points 
+  }
+  return axios({
+    method: 'post',
+    url: 'http://127.0.0.1:5000/structure/range_modes',
+    data: post
+  })
+  .then(response => {
+    console.log(response.data)
+    // Handle successful response here
+    // You can return the data if needed
+    return response.data;
+    // Continue with your calculation logic using k1 and other parameters
+  })
+  .catch(error => {
+    // Handle error here
+    console.error('Error:', error);
+    // You may want to throw the error again or handle it differently based on your needs
+    throw error;
+  });
+}
 
 
 

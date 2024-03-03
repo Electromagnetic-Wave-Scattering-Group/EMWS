@@ -1,11 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { calculateModes, calculateField} from '../service/api.js';
+import { calculateModes, calculateField, calculateRangeOfModes} from '../service/api.js';
+import Breadcrumb from 'primevue/breadcrumb';
  
 
 interface DynamicDataStructure<T> {
     num: T;
     data: Array<{ name: string, length: number, epsilon: number[]; mu: number[] }>;
+}
+
+
+interface ModeArray<N> {
+  num: N;
+  modes: Array<Array<{ im: number; re: number }>>;
 }
 
 interface ResponseData {
@@ -14,6 +21,19 @@ interface ResponseData {
   eigenvectors: [];
   modes: [];
 }
+
+interface TransmissionResponse {
+  data: Array<{
+    omega: number;
+    frequencyData: {
+      eigenvalues: Array<Array<{ im: number; re: number }>>;
+      // Add other properties if needed (e.g., maxwell_matrices, eigenvectors, modes)
+    };
+  }>;
+}
+
+
+
 
 interface FieldResponse {
     z: []
@@ -43,6 +63,12 @@ export const paramStore = defineStore('params', () => {
   const Hx = ref([])
   const Hy = ref([])
   const Hz = ref([])
+  const frequencyLeft = ref(.1)
+  const frequencyRight = ref(.5)
+  const points = ref(4)
+  const omegaRange = ref<number[]>([]);
+  const modeRange = ref<Array<Array<{ im: number; re: number }>>>([]);
+
   var shouldRender = ref(false)
   let modes = ref(
     [
@@ -139,6 +165,57 @@ export const paramStore = defineStore('params', () => {
       console.error('Error:', error);
     });
   }
+
+
+  function setRangeOfModes() {
+    calculateRangeOfModes().then((data: TransmissionResponse) => {
+      const responseData = data.data;
+      
+      for (let i = 0; i < responseData.length; i++) {
+        const entry = responseData[i];
+        omegaRange.value.push(entry.omega)  
+        console.log(entry.frequencyData.eigenvalues)
+
+        // modeRange.value.push(entry.frequencyData.eigenvalues)
+
+      }
+      console.log(omegaRange)
+
+      // for (var index in responseData) {
+      //   console.log(responseData.indexOf(index))
+      //   console.log(index)       // Access the 'omega' property from each entry and add it to omegaRange
+      //   // omegaRange.value.push(index.omega);
+  
+      //   // // Access the 'frequencyData' property from each entry
+      //   // const frequencyData = entry.frequencyData;
+  
+      //   // // Now you can access specific properties from frequencyData if needed
+      //   // const eigenvalues = frequencyData.eigenvalues;
+      //   // const maxwellMatrices = frequencyData.maxwell_matrices;
+      //   // const eigenvectors = frequencyData.eigenvectors;
+      //   // const modes = frequencyData.modes;
+      //   // Continue with your logic for frequencyData if necessary
+      // }
+
+
+    // Access the eigenvalues property from the data
+    // Set the modes variable
+    // modes.value = data.eigenvalues;
+    // maxwell_matrices.value = data.maxwell_matrices;
+    // eigenvectors.value = data.eigenvectors;
+    
+    // // Continue with your logic
+    // console.log(modes.value);
+  })
+  .catch((error: Error) => {
+    // Handle error here
+    console.error('Error:', error);
+  });
+}
+
+
+
+
   function calcField() {
     calculateField().then((data: FieldResponse) => {
       // Access the eigenvalues property from the data
@@ -162,6 +239,6 @@ export const paramStore = defineStore('params', () => {
 
 
   return { k1, k2, frequency, selectedModes, coeffecients, experiment, checkInputs, state, buildStruct, getDynamicStructure, updateDynamicStructure, ...computedProperties, setModes, modes, calcField,
-  maxwell_matrices, eigenvalues, eigenvectors, Ex, Ey, Ez, Hx, Hy, Hz, z, shouldRender}
+  maxwell_matrices, eigenvalues, eigenvectors, Ex, Ey, Ez, Hx, Hy, Hz, z, shouldRender, frequencyLeft, frequencyRight, setRangeOfModes, points}
 })
 
