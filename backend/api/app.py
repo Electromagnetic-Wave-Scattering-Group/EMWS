@@ -243,7 +243,7 @@ def bar():
         epsilon = np.array(layer['epsilon']).astype(float).reshape(3,3)
         mu = np.array(layer['mu']).astype(float).reshape(3,3)
         struct.addLayer(layer['name'], int(layer['length']), epsilon, mu)
-
+        print(epsilon)
     struct.buildMatrices()
     struct.calcEig()
     struct.calcModes()
