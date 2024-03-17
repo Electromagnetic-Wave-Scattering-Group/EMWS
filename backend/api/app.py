@@ -220,7 +220,7 @@ def range_modes():
 
 
 
-
+        
     # return data
     return {'data': data}
 
