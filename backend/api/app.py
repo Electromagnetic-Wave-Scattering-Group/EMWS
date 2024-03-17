@@ -9,7 +9,7 @@ import matplotlib.pyplot as  plt
 # Run server by calling python app.py
 app = Flask(__name__)
 # List of accepted origins
-origins = ["http://localhost:8000",
+origins = ["http://localhost:*",
 "https://www.math.lsu.edu"
 ]
 # Change origins to '*' if this solution gives issues
@@ -154,80 +154,6 @@ def decode_constants(m):
 
 
 
-
-
-@app.route('/structure/range_modes', methods=['POST'])
-@cross_origin()
-def range_modes():
-    req = json.loads(request.data)
-    startOmega = float(req['frequencyLeft'])
-    endOmega = float(req['frequencyRight'])
-    points = int(req['points'])
-    k1 = float(req['k1'])
-    k2 = float(req['k2'])
-    layers = req['layers']['data']
-    num = int(req['layers']['num'])
-    interval = (endOmega - startOmega) / points 
-
-    omega = startOmega
-    interval = (endOmega - startOmega) / points 
-
-    data = []
-
-    while omega < endOmega: 
-        struct = s(num, omega, k1, k2)
-
-        for layer in layers: 
-            epsilon = np.array(layer['epsilon']).astype(float).reshape(3,3)
-            mu = np.array(layer['mu']).astype(float).reshape(3,3)
-            struct.addLayer(layer['name'], int(layer['length']), epsilon, mu)
-
-        struct.buildMatrices()
-        struct.calcEig()
-        struct.calcModes()
-
-        # # Create list of values for response
-        maxwells = []
-        e_vals = []
-        e_vecs = []
-        modes = []
-        i = 0
-        for layer in struct.layers:
-            m = encode_maxwell(struct.maxwell[i])
-            n = encode_eigen(layer.eigVal.tolist())
-            o = encode_evecs(layer.eigVec.tolist())
-            mm = encode_evecs(layer.mode.tolist())
-
-
-            maxwells.append(m)
-            e_vals.append(n)
-            e_vecs.append(o)
-            modes.append(mm)
-        i+= 1
-
-        frequencyData = {
-            # 'maxwell_matrices': maxwells,
-            'eigenvalues': e_vals,
-            # 'eigenvectors': e_vecs,
-            # 'modes': modes
-        }
-
-        returnData = {'omega': omega, 'frequencyData': frequencyData}
-        data.append(returnData)
-        omega += interval
-
-
-
-
-
-        
-    # return data
-    return {'data': data}
-
-
-
-
-
 @app.route('/structure/test', methods=['POST'])
 @cross_origin()
 def bar():
@@ -243,7 +169,6 @@ def bar():
         epsilon = np.array(layer['epsilon']).astype(float).reshape(3,3)
         mu = np.array(layer['mu']).astype(float).reshape(3,3)
         struct.addLayer(layer['name'], int(layer['length']), epsilon, mu)
-        print(epsilon)
 
     struct.buildMatrices()
     struct.calcEig()

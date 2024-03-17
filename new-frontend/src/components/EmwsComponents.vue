@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 import { paramStore } from '@/store/emws'
 
@@ -12,14 +12,15 @@ const experiment = ref('')
 const coeffecients = [1, 0, 0, 0]
 const frequencyStart = ref()
 const frequencyEnd = ref()
-const series = ref([
+
+const series = computed(() => ([
   { name: 'Ex', data: parameterStore.Ex },
   { name: 'Ey', data: parameterStore.Ey },
   { name: 'Ez', data: parameterStore.Ez },
   { name: 'Hx', data: parameterStore.Hx },
   { name: 'Hy', data: parameterStore.Hy },
   { name: 'Hz', data: parameterStore.Hz },
-]);
+]))
 
 const chartOptions = ref({
   chart: {
@@ -31,7 +32,9 @@ const chartOptions = ref({
       enabled: false,
     },
   },
-  
+  tooltip: {
+    theme: 'dark'
+  },
   dataLabels: {
     enabled: false,
   },
@@ -168,12 +171,6 @@ const chartOptions = ref({
   </v-row>
 
 </v-container>
-<v-container >
-    <div id="chart">
-        <apexchart type="area" height="350" ></apexchart>
-    </div>
-</v-container>
-
 
 <v-container class="bg-surface-variant" v-if="experiment == 'Transmission Experiment'">
     <v-row no-gutters>
@@ -255,10 +252,11 @@ const chartOptions = ref({
   </v-row>
 
 </v-container>
-  <!-- <v-container class="bg-surface-variant" v-if="parameterStore.shouldRender">
-    <div id="chart">
-      <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>    </div>
-  </v-container> -->
+<v-container class="bg-surface-variant" v-if="parameterStore.shouldRender">
+  <div id="chart">
+    <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>
+  </div>
+</v-container>
 
 
 
