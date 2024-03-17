@@ -154,6 +154,8 @@ def decode_constants(m):
 
 
 
+
+
 @app.route('/structure/range_modes', methods=['POST'])
 @cross_origin()
 def range_modes():
@@ -221,8 +223,6 @@ def range_modes():
 
     # return data
     return {'data': data}
-
-
 
 
 
