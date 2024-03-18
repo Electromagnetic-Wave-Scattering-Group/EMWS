@@ -22,10 +22,15 @@
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e --browser chrome'"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "6.5.1",
+    "apexcharts": "3.46.0",
     "pinia": "^2.1.6",
+    "primevue": "^3.49.1",
     "vue": "^3.3.4",
     "vue-i18n": "^9.5.0",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue3-apexcharts": "^1.5.2",
+    "vuetify": "^3.5.7"
   },
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^1.4.0",

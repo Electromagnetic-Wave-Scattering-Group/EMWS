@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { calculateModes, calculateField, calculateRangeOfModes} from '../service/api.js';
+import { calculateModes, calculateField, calculateRangeOfModes} from '@/service/api';
 import Breadcrumb from 'primevue/breadcrumb';
  
 
@@ -69,7 +69,7 @@ export const paramStore = defineStore('params', () => {
   const omegaRange = ref<number[]>([]);
   const modeRange = ref<Array<Array<{ im: number; re: number }>>>([]);
 
-  var shouldRender = ref(false)
+  let shouldRender = ref(false)
   let modes = ref(
     [
     [

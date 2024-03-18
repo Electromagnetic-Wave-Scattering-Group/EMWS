@@ -9,7 +9,7 @@ import matplotlib.pyplot as  plt
 # Run server by calling python app.py
 app = Flask(__name__)
 # List of accepted origins
-origins = ["http://localhost:8000",
+origins = ["http://localhost:*",
 "https://www.math.lsu.edu"
 ]
 # Change origins to '*' if this solution gives issues
