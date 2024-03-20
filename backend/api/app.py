@@ -156,7 +156,7 @@ def decode_constants(m):
 
 
 
-@app.route('/structure/range_modes', methods=['POST'])
+@app.route('/structure/transmission', methods=['POST'])
 @cross_origin()
 def range_modes():
     req = json.loads(request.data)
@@ -167,62 +167,46 @@ def range_modes():
     k2 = float(req['k2'])
     layers = req['layers']['data']
     num = int(req['layers']['num'])
+    coeffecients = req['coeffecients']
     interval = (endOmega - startOmega) / points 
-
     omega = startOmega
     interval = (endOmega - startOmega) / points 
-
-    data = []
-
-    while omega < endOmega: 
+    omegas = []
+    transmission_vals = []
+    print(interval)
+    f= open('transmissiontext.txt', 'w')
+    while omega < endOmega:
+        print(k1, k2, omega, file=f)
         struct = s(num, omega, k1, k2)
 
         for layer in layers: 
             epsilon = np.array(layer['epsilon']).astype(float).reshape(3,3)
             mu = np.array(layer['mu']).astype(float).reshape(3,3)
             struct.addLayer(layer['name'], int(layer['length']), epsilon, mu)
+            print(layer)
 
-        struct.buildMatrices()
-        struct.calcEig()
+
+        m = struct.buildMatrices()
+        eig = struct.calcEig()
         struct.calcModes()
+        struct.calcScattering()
+        struct.calcConstants(int(coeffecients[0]), int(coeffecients[1]), int(coeffecients[2]), int(coeffecients[3]))
+        tr = struct.calculateTransmission()
 
-        # # Create list of values for response
-        maxwells = []
-        e_vals = []
-        e_vecs = []
-        modes = []
-        i = 0
-        for layer in struct.layers:
-            m = encode_maxwell(struct.maxwell[i])
-            n = encode_eigen(layer.eigVal.tolist())
-            o = encode_evecs(layer.eigVec.tolist())
-            mm = encode_evecs(layer.mode.tolist())
+            # e = layer.epsilon
+            # u = layer.mu
+            # k1 = self.k1
+            # k2 = self.k2
+            # imaginary = complex(0, 1)
+            # omega = self.omega * imaginary
 
 
-            maxwells.append(m)
-            e_vals.append(n)
-            e_vecs.append(o)
-            modes.append(mm)
-        i+= 1
 
-        frequencyData = {
-            # 'maxwell_matrices': maxwells,
-            'eigenvalues': e_vals,
-            # 'eigenvectors': e_vecs,
-            # 'modes': modes
-        }
-
-        returnData = {'omega': omega, 'frequencyData': frequencyData}
-        data.append(returnData)
+        omegas.append(omega)
+        transmission_vals.append(tr)
         omega += interval
-
-
-
-
-
-        
-    # return data
-    return {'data': data}
+    f.close()
+    return {'omega': omegas, 'transmission': transmission_vals}
 
 
 
@@ -290,17 +274,17 @@ def swapArrayIndices(a, i, j):
 #     # print('Matrix After Swap: ', a)
 #     return a
 
-def orderEigs(eigenvalues, eigenvectors, selected, n): 
+def orderEigs(eigenvalues, eigenvectors, selectedLeft, selectedRight, n): 
     # first set 
 
     for value in eigenvalues[0]: 
         # print(value)
-        if value == selected[0]: 
+        if value == selectedLeft[0]: 
             index = eigenvalues[0].index(value)
             swapArrayIndices(eigenvalues[0], index, 0)
             swapArrayIndices(eigenvectors[0], index, 0)
 
-        if value == selected[1]: 
+        if value == selectedLeft[1]: 
             index = eigenvalues[0].index(value)
 
             # # index = eigenvalues[0].index(value)
@@ -312,12 +296,12 @@ def orderEigs(eigenvalues, eigenvectors, selected, n):
         else: 
             pass 
     for value in eigenvalues[n-1]:        
-        if value == selected[2]: 
+        if value == selectedRight[0]: 
             index = eigenvalues[n-1].index(value)
             swapArrayIndices(eigenvalues[n-1], index, 2)
             swapArrayIndices(eigenvectors[n-1], index, 2)
 
-        if value == selected[3]: 
+        if value == selectedRight[1]: 
             index = eigenvalues[n-1].index(value)
             swapArrayIndices(eigenvalues[n-1], index, 3)
             swapArrayIndices(eigenvectors[n-1], index, 3)
@@ -338,7 +322,8 @@ def testfield():
     k2 = float(req['k2'])
     layers = req['layers']['data']
     num = int(req['layers']['num'])
-    selected = req['selected_modes']
+    selectedLeft = req['selectedLeft']
+    selectedRight = req['selectedRight']
     maxwell_matrices = req['maxwell_matrices']
     eigenvalues = req['eigenvalues']
     eigenvectors = req['eigenvectors']
@@ -379,7 +364,7 @@ def testfield():
     else:
         e_vals = []
         e_vecs = []
-        vals, vecs = orderEigs(eigenvalues, eigenvectors, selected, num)
+        vals, vecs = orderEigs(eigenvalues, eigenvectors, selectedLeft, selectedRight, num)
 
         for val in vals:
             e_vals.append(decode_eigen(val))
@@ -682,68 +667,70 @@ def constants():
 
 
 
-@app.route('/structure/transmission', methods=['POST'])
-@cross_origin()
-def transmission():
-    assert request.method == 'POST'
-    req = json.loads(request.data)
-    startOmega = req['wLeft']
-    endOmega = req['wRight']
-    k1 = req['k1']
-    k2 = req['k2']
-    layers = req['layers']
-    points = req['points']
-    incoming = req['incoming']
-    interval = (endOmega - startOmega) / points 
-    # right now assume 3 layer system
-    num = 3
-    # # Setup return data
-    transmissionRes = []
-    omegas = []
+# @app.route('/structure/transmission', methods=['POST'])
+# @cross_origin()
+# def transmission():
+#     assert request.method == 'POST'
+#     req = json.loads(request.data)
+#     startOmega = req['wLeft']
+#     endOmega = req['wRight']
+#     k1 = req['k1']
+#     k2 = req['k2']
+#     layers = req['layers']
+#     points = req['points']
+#     incoming = req['incoming']
+#     interval = (endOmega - startOmega) / points 
+#     print('-------')
+#     print(interval)
+#     # right now assume 3 layer system
+#     num = 3
+#     # # Setup return data
+#     transmissionRes = []
+#     omegas = []
 
-    eigValsImaginaryNegative = []
-    eigValsImaginaryPositive = []
+#     eigValsImaginaryNegative = []
+#     eigValsImaginaryPositive = []
 
-    data = {}
-    omega = startOmega
-    while omega < endOmega:
+#     data = {}
+#     omega = startOmega
+#     while omega < endOmega:
 
 
-        struct = s(num, omega, k1, k2)
-        for layer in layers:
-        # build layers
-            struct.addLayer(layer['name'], layer['length'], layer['epsilon'], layer['mu'])
+#         struct = s(num, omega, k1, k2)
+#         for layer in layers:
+#         # build layers
+#             struct.addLayer(layer['name'], layer['length'], layer['epsilon'], layer['mu'])
 
-        struct.buildMatrices()
-        struct.calcEig()
-        struct.calcModes()
+#         struct.buildMatrices()
+#         struct.calcEig()
+#         struct.calcModes()
         
-        const = struct.calcConstants(incoming[0], incoming[1], incoming[2], incoming[3])
+#         const = struct.calcConstants(incoming[0], incoming[1], incoming[2], incoming[3])
 
-        for n in range(len(layers)):
-            if( n == 0 ) :
-                print('For layer ' + str(n+1))
-                print(struct.layers[n].eigVal)
-                struct.eigValsOnlyImaginary(n,eigValsImaginaryNegative,eigValsImaginaryPositive)
+#         for n in range(len(layers)):
+#             if( n == 0 ) :
+#                 print('For layer ' + str(n+1))
+#                 print(struct.layers[n].eigVal)
+#                 struct.eigValsOnlyImaginary(n,eigValsImaginaryNegative,eigValsImaginaryPositive)
 
-        transmission = struct.calculateTransmission()
-        transmissionRes.append(transmission) 
-        omegas.append(omega)
+#         transmission = struct.calculateTransmission()
+#         transmissionRes.append(transmission) 
+#         omegas.append(omega)
 
-        omega += interval 
+#         omega += interval 
 
 
-    data = {
-        'imaginaryEigenValues': {
-            'imNeg': eigValsImaginaryNegative,
-            'imPos': eigValsImaginaryPositive
-        },
-        'transmission': transmissionRes,
-        'omegas': omegas
-    }
-    response = json.jsonify(data)
+#     data = {
+#         'imaginaryEigenValues': {
+#             'imNeg': eigValsImaginaryNegative,
+#             'imPos': eigValsImaginaryPositive
+#         },
+#         'transmission': transmissionRes,
+#         'omegas': omegas
+#     }
+#     response = json.jsonify(data)
 
-    return response
+#     return response
 
 if __name__ == '__main__':
     app.run()

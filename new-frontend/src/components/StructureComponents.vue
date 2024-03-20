@@ -66,25 +66,16 @@ const finalizeStruct = () => {
                 type="number"
               ></v-text-field>
             </v-row>
-          <v-row v-for="i in 3" :key="i">
-            
-            <v-col v-for="j in 3" :key="j">
-              <v-text-field
-                v-model="layer.epsilon[(i - 1) * 3 + j - 1]"
-                :label="`Epsilon ${(i - 1) * 3 + j }`"
-                type="number"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row v-for="i in 3" :key="i">
-            <v-col v-for="j in 3" :key="j">
-              <v-text-field
-                v-model="layer.mu[(i - 1) * 3 + j - 1]"
-                :label="`Mu ${(i - 1) * 3 + j }`"
-                type="number"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+            <v-row v-for="i in 3" :key="i">
+        <v-col v-for="j in 3" :key="j">
+          <v-text-field v-model="layer.epsilon[(i - 1) * 3 + j - 1]" :label="`Epsilon ${i}${j}`" type="number"></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row v-for="i in 3" :key="i">
+        <v-col v-for="j in 3" :key="j">
+          <v-text-field v-model="layer.mu[(i - 1) * 3 + j - 1]" :label="`Mu ${i}${j}`" type="number"></v-text-field>
+        </v-col>
+      </v-row>
         </v-col>
       </v-row>
     </v-container>

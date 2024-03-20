@@ -7,7 +7,7 @@ export function calculateModes() {
   const parameterStore = paramStore();
   const omega = parameterStore.frequency;
   const k1 = parameterStore.k1;
-  const k2 = parameterStore.k1;
+  const k2 = parameterStore.k2;
   const layers = parameterStore.state.dynamicStructure
   
 
@@ -38,15 +38,15 @@ export function calculateModes() {
   });
 }
 
-export function calculateRangeOfModes() {
+export function calculateTransmissionValues() {
   const parameterStore = paramStore();
   const frequencyLeft = parameterStore.frequencyLeft;
   const frequencyRight = parameterStore.frequencyRight;
   const k1 = parameterStore.k1;
-  const k2 = parameterStore.k1;
-  const layers = parameterStore.state.dynamicStructure
-  const points = parameterStore.points
-
+  const k2 = parameterStore.k2;
+  const layers = parameterStore.state.dynamicStructure;
+  const points = parameterStore.points;
+  const coeffecients = parameterStore.transmissionCoeffecients;
 
   const post = {
     'frequencyLeft': frequencyLeft, 
@@ -54,11 +54,12 @@ export function calculateRangeOfModes() {
     'k1': k1, 
     'k2': k2, 
     'layers': layers, 
-    'points': points 
+    'points': points, 
+    'coeffecients': coeffecients
   }
   return axios({
     method: 'post',
-    url: 'http://127.0.0.1:5000/structure/range_modes',
+    url: 'http://127.0.0.1:5000/structure/transmission',
     data: post
   })
   .then(response => {
@@ -85,13 +86,15 @@ export function calculateField() {
   const k2 = parameterStore.k1;
   const layers = parameterStore.state.dynamicStructure
   const incoming = parameterStore.coeffecients
-  const selected = parameterStore.selectedModes
+  const selectedLeft = parameterStore.selectedModesLeft
+  const selectedRight = parameterStore.selectedModesRight
   const post = {
     'k1': k1, 
     'k2': k2, 
     'omega': omega, 
     'incoming': incoming,
-    'selected_modes': selected,
+    'selectedLeft': selectedLeft,
+    'selectedRight': selectedRight,
     'maxwell_matrices': parameterStore.maxwell_matrices,
     'eigenvalues': parameterStore.modes,
     'eigenvectors': parameterStore.eigenvectors,

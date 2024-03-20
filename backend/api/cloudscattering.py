@@ -145,7 +145,6 @@ def organizeEigen(val, vec):
     # vec = swapMatrixColumns(vec, 3, 2)
     return val, vec
 
-
 def organizeEigenForMiddleLayers(val, vec):
     for i in range(4):
         v = val[i]
@@ -235,16 +234,12 @@ class Structure:
             print('\nBuilding Maxwell')
         maxwell_matrices = []
         for layer in self.layers:
-            
             e = layer.epsilon
             u = layer.mu
-            k1 = float(self.k1)
-            k2 = float(self.k2)
-            w = float(self.omega)
-
+            k1 = self.k1
+            k2 = self.k2
             imaginary = complex(0, 1)
-            omega = w * imaginary
-
+            omega = self.omega * imaginary
             m11 = omega * (-(e[2][0]*k1/e[2][2]) - (k2*u[1][2]/u[2][2]))
             m12 = omega * (-(e[2][1]*k1/e[2][2]) + (k1*u[1][2]/u[2][2]))
             m13 = omega * ((k1*k2/e[2][2]) + u[1][0] -
@@ -299,6 +294,7 @@ class Structure:
                 self.layers[n].eigVal, self.layers[n].eigVec = organizeEigen(eigVal, eigVec)
             else:
                 self.layers[n].eigVal, self.layers[n].eigVec = organizeEigenForMiddleLayers(eigVal, eigVec)
+        return self.layers[0].eigVal
 
     def eigValsOnlyImaginary(self,n,eigValsImaginaryNegative, eigValsImaginaryPositive):
         return onlyEigenValsImaginary(self.layers[n].eigVal, eigValsImaginaryNegative, eigValsImaginaryPositive)
@@ -620,7 +616,7 @@ class Structure:
         constants = self.constants
         mode_1 = self.layers[0].eigVal[0]
         mode_2 = self.layers[0].eigVal[1]
-
+        
 
         transmitted = constants[4*(layers) - 4]
         transmisssionSq = np.real(transmitted)**2 + np.imag(transmitted)**2
@@ -633,6 +629,24 @@ class Structure:
         else: 
             print('Transmission Issues: please check parameters')
             return np.sqrt(transmisssionSq)
+
+
+
+    # def calculateTransmission(self):
+    #     layers = self.num
+    #     constants = self.constants
+
+    #     transmitted = constants[4*(layers) - 4]
+    #     transmisssionSq = np.real(transmitted)**2 + np.imag(transmitted)**2
+    #     reflected = constants[2]
+    #     reflectionSq = np.real(reflected)**2 + np.imag(reflected)**2
+
+    #     if isNumZero((transmisssionSq + reflectionSq) - 1): 
+    #         print('Transmitted and Reflected acting correctly')
+    #         return np.sqrt(transmisssionSq)
+    #     else: 
+    #         print('Transmission Issues: please check parameters')
+    #         return np.sqrt(transmisssionSq)
 
 
     # The structure string method

@@ -19,8 +19,8 @@ const series = computed(() => ([
   { name: 'Ez', data: parameterStore.Ez },
   { name: 'Hx', data: parameterStore.Hx },
   { name: 'Hy', data: parameterStore.Hy },
-  { name: 'Hz', data: parameterStore.Hz },
-]))
+  { name: 'Hz', data: parameterStore.Hz }
+])) 
 
 const chartOptions = ref({
   chart: {
@@ -42,7 +42,7 @@ const chartOptions = ref({
     curve: 'straight',
   },
   title: {
-    text: 'E and H Field Values at initial time',
+    text: 'E and H Field Values',
     align: 'left',
     style: {
       color: '#fff',  // Set the title text color to white
@@ -83,6 +83,75 @@ const chartOptions = ref({
   },
   
 });
+
+
+const transmissionChartOptions = ref({
+  chart: {
+    height: 350,
+    width: '100%',
+
+    type: 'line',
+    zoom: {
+      enabled: false,
+    },
+  },
+  tooltip: {
+    theme: 'dark'
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  stroke: {
+    curve: 'straight',
+  },
+  title: {
+    text: 'Transmission Values',
+    align: 'left',
+    style: {
+      color: '#fff',  // Set the title text color to white
+    },
+  },
+  grid: {
+    row: {
+      colors: ['##C4BBAF'],
+      opacity: 0.5,
+    },
+  },
+  theme: {
+    palette: 'palette3',
+  },
+  xaxis: {
+    categories: parameterStore.omegaRange,
+    tickAmount: 10,
+    labels: {
+      style: {
+        colors: '#fff',  // Set x-axis labels text color to white
+      },
+    },
+  },
+  yaxis: {
+    labels: {
+      formatter: function (value: number) {
+        return value.toFixed(2);  // Format y-axis values to two decimal places
+      },
+      style: {
+        colors: '#fff',  // Set y-axis values text color to white
+      },
+    },
+  },
+  legend: {
+    labels: {
+      colors: '#fff',  // Set legend labels text color to white
+    },
+  },
+  
+});
+
+
+
+const transmissionSeries = computed(() => ([
+  { name: 'transmission', data: parameterStore.transmissionRange },
+])) 
 
 
 </script>
@@ -129,20 +198,21 @@ const chartOptions = ref({
       <v-row>
         <v-col>
             <v-checkbox v-for="(mode, index) in parameterStore.modes[0]" :key="index"
-              v-model="parameterStore.selectedModes"
+              v-model="parameterStore.selectedModesLeft"
               :label="`${mode.re.toFixed(2)} +  ${mode.im.toFixed(2)} j`"
               :value="mode"
             ></v-checkbox>
           </v-col>
           <v-col>
             <v-checkbox v-for="(mode, index) in parameterStore.modes[parameterStore.state.layerNum - 1]" :key="index"
-              v-model="parameterStore.selectedModes"
+              v-model="parameterStore.selectedModesRight"
               :label="`${mode.re.toFixed(2)} +  ${mode.im.toFixed(2)} j`"
               :value="mode"
             ></v-checkbox>
           </v-col>
 
       </v-row>
+      <v-btn block class="mt-2" @click="parameterStore.clearModes()">Clear Mode Selection</v-btn >
     </v-col>
     <v-col>
       Please Select Coeffecients
@@ -174,7 +244,7 @@ const chartOptions = ref({
 
 <v-container class="bg-surface-variant" v-if="experiment == 'Transmission Experiment'">
     <v-row no-gutters>
-    <v-col >
+    <v-col class="mr-4">
       Please Input Parameters for the Signal
         <v-form @submit.prevent>
           <v-text-field
@@ -203,34 +273,14 @@ const chartOptions = ref({
             label="points"
             type="number">
           </v-text-field>
-          <v-btn block class="mt-2" @click="parameterStore.setRangeOfModes">Calculate Modes</v-btn >
       </v-form>
     </v-col > 
-    <v-col>
-      Please Select Your Modes
-      <v-row>
-        <v-col>
-            <v-checkbox v-for="(mode, index) in parameterStore.modes[0]" :key="index"
-              v-model="parameterStore.selectedModes"
-              :label="`${mode.re.toFixed(2)} +  ${mode.im.toFixed(2)} j`"
-              :value="mode"
-            ></v-checkbox>
-          </v-col>
-          <v-col>
-            <v-checkbox v-for="(mode, index) in parameterStore.modes[parameterStore.modes.length - 1]" :key="index"
-              v-model="parameterStore.selectedModes"
-              :label="`${mode.re.toFixed(2)} +  ${mode.im.toFixed(2)} j`"
-              :value="mode"
-            ></v-checkbox>
-          </v-col>
-      </v-row>
-    </v-col>
-    <v-col>
+    <v-col class="ml-4">
       Please Select Coeffecients
       <v-row>
         <v-col>
           <v-text-field v-for="(coeff, index) in coeffecients.slice(0, 2)" :key="index"
-              v-model="parameterStore.coeffecients[index]"
+              v-model="parameterStore.transmissionCoeffecients[index]"
               :label="`C ${index+1}`"
               type="number"
               >
@@ -238,27 +288,31 @@ const chartOptions = ref({
         </v-col>
         <v-col>
           <v-text-field v-for="(coeff, index) in coeffecients.slice(2,4)" :key="index"
-              v-model="parameterStore.coeffecients[index+2]"
+              v-model="parameterStore.transmissionCoeffecients[index+2]"
               :label="`C ${index + 3}`"
               type="number"
               >
           </v-text-field>
         </v-col>
       </v-row>
-      <v-btn @click="parameterStore.checkInputs()" block class="mt-2">Run Experiment</v-btn>
+      <v-btn @click="parameterStore.calculateTransmission()" block class="mt-2">Run Experiment</v-btn>
 
     </v-col> 
 
   </v-row>
 
 </v-container>
-<v-container class="bg-surface-variant" v-if="parameterStore.shouldRender">
+<v-container class="bg-surface-variant" v-if="parameterStore.shouldRender, experiment=='Scattering Experiment'">
   <div id="chart">
     <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>
   </div>
 </v-container>
 
-
+<v-container class="bg-surface-variant" v-if="parameterStore.shouldRender, experiment=='Transmission Experiment'">
+  <div id="chart">
+    <apexchart type="line" height="350" :options="transmissionChartOptions" :series="transmissionSeries"></apexchart>
+  </div>
+</v-container>
 
 
 

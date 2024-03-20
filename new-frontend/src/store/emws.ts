@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { calculateModes, calculateField, calculateRangeOfModes} from '@/service/api';
+import { calculateModes, calculateField, calculateTransmissionValues} from '@/service/api';
 import Breadcrumb from 'primevue/breadcrumb';
  
 
@@ -44,14 +44,22 @@ interface FieldResponse {
     Ez: []
     Hz: []
 }
+
+
+interface TransmissionReponse{
+  omega: [], 
+  transmission: []
+}
 export const paramStore = defineStore('params', () => {
 
 // numerical parameters 
-  const frequency = ref(.5);
-  const k1 = ref(.2);
+  const frequency = ref(.398);
+  const k1 = ref(.5);
   const k2 = ref(.22);
-  let selectedModes = ref([])
+  let selectedModesLeft = ref([])
+  let selectedModesRight = ref([])
   let coeffecients = ref([])
+  let transmissionCoeffecients = ref([])
   const experiment = ref('')
   const maxwell_matrices = ref([])
   const eigenvalues = ref([])
@@ -66,8 +74,8 @@ export const paramStore = defineStore('params', () => {
   const frequencyLeft = ref(.1)
   const frequencyRight = ref(.5)
   const points = ref(4)
-  const omegaRange = ref<number[]>([]);
-  const modeRange = ref<Array<Array<{ im: number; re: number }>>>([]);
+  const omegaRange = ref([]);
+  const transmissionRange = ref([]);
 
   let shouldRender = ref(false)
   let modes = ref(
@@ -112,7 +120,7 @@ export const paramStore = defineStore('params', () => {
 )
 
   function checkInputs() {
-    console.log(frequency, k1, k2, selectedModes, coeffecients, experiment)
+    console.log(frequency, k1, k2, selectedModesLeft, selectedModesRight, coeffecients, experiment)
   }
   
   
@@ -121,8 +129,25 @@ export const paramStore = defineStore('params', () => {
     dynamicStructure: null as DynamicDataStructure<number> | null,
   };
 
-  function buildStruct(layerNum: number, layerDataArray: Array<{ name: string, length: number, epsilon: number[]; mu: number[] }>): 
-    { dynamicStructure: DynamicDataStructure<number>; layerNum: number } {
+
+
+  function buildStructure(num, data){
+    console.log('a;sdlokjasd;lfj;lasdjf;')
+    console.log(num)
+
+    const dynamicStructure: DynamicDataStructure<number> = {
+      num: num,
+      data: data,
+    };
+    console.log('{}{}{}{}{')
+    console.log(dynamicStructure)
+  }
+
+  function buildStruct(layerNum: number, layerDataArray: Array<{ name: string, length: number, epsilon: number[]; mu: number[] }>):
+  { 
+    dynamicStructure: DynamicDataStructure<number>; layerNum: number 
+  } 
+  {
     const dynamicStructure: DynamicDataStructure<number> = {
       num: layerNum,
       data: layerDataArray,
@@ -166,53 +191,27 @@ export const paramStore = defineStore('params', () => {
     });
   }
 
-
-  function setRangeOfModes() {
-    calculateRangeOfModes().then((data: TransmissionResponse) => {
-      const responseData = data.data;
-      
-      for (let i = 0; i < responseData.length; i++) {
-        const entry = responseData[i];
-        omegaRange.value.push(entry.omega)  
-        console.log(entry.frequencyData.eigenvalues)
-
-        // modeRange.value.push(entry.frequencyData.eigenvalues)
-
-      }
-      console.log(omegaRange)
-
-      // for (var index in responseData) {
-      //   console.log(responseData.indexOf(index))
-      //   console.log(index)       // Access the 'omega' property from each entry and add it to omegaRange
-      //   // omegaRange.value.push(index.omega);
-  
-      //   // // Access the 'frequencyData' property from each entry
-      //   // const frequencyData = entry.frequencyData;
-  
-      //   // // Now you can access specific properties from frequencyData if needed
-      //   // const eigenvalues = frequencyData.eigenvalues;
-      //   // const maxwellMatrices = frequencyData.maxwell_matrices;
-      //   // const eigenvectors = frequencyData.eigenvectors;
-      //   // const modes = frequencyData.modes;
-      //   // Continue with your logic for frequencyData if necessary
-      // }
+  function clearModes() {
+    selectedModesLeft.value = []
+    selectedModesRight.value = []
+  }
 
 
-    // Access the eigenvalues property from the data
-    // Set the modes variable
-    // modes.value = data.eigenvalues;
-    // maxwell_matrices.value = data.maxwell_matrices;
-    // eigenvectors.value = data.eigenvectors;
-    
-    // // Continue with your logic
-    // console.log(modes.value);
-  })
-  .catch((error: Error) => {
-    // Handle error here
-    console.error('Error:', error);
-  });
-}
 
+  function calculateTransmission() {
+    calculateTransmissionValues().then((data: TransmissionReponse) => {
+      // Access the eigenvalues property from the data
+      // Set the modes variable
+      omegaRange.value = data.omega
+      transmissionRange.value = data.transmission
+      // Continue with your logic
+
+    })
+    .catch((error: Error) => {
+      // Handle error here
+      console.error('Error:', error);
+    });
+  }
 
 
 
@@ -238,7 +237,7 @@ export const paramStore = defineStore('params', () => {
   }
 
 
-  return { k1, k2, frequency, selectedModes, coeffecients, experiment, checkInputs, state, buildStruct, getDynamicStructure, updateDynamicStructure, ...computedProperties, setModes, modes, calcField,
-  maxwell_matrices, eigenvalues, eigenvectors, Ex, Ey, Ez, Hx, Hy, Hz, z, shouldRender, frequencyLeft, frequencyRight, setRangeOfModes, points}
+  return { k1, k2, frequency, selectedModesLeft, selectedModesRight, coeffecients, experiment, checkInputs, state, buildStruct, getDynamicStructure, updateDynamicStructure, ...computedProperties, setModes, modes, calcField,
+  maxwell_matrices, eigenvalues, eigenvectors, calculateTransmission, omegaRange, transmissionRange, transmissionCoeffecients, Ex, Ey, Ez, Hx, Hy, Hz, z, clearModes,  shouldRender, frequencyLeft, frequencyRight, points}
 })
 
