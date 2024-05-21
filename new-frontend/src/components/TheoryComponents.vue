@@ -9,6 +9,7 @@ defineProps<{ msg: string }>()
 const count = ref(0)
 const doubleCount = computed(() => count.value * 2)
 const increment = () => count.value++
+const formula = '$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$'
 </script>
 
 <template>
@@ -18,14 +19,19 @@ const increment = () => count.value++
   width="1000"
   title="Layered Structures"
 ></v-card>
-<v-card variant="tonal"
-  width="1000"
-  subtitle="Each layer within a layered structure has a correspodning electric and magnetic tensor matrix"
-></v-card>
-<v-card variant="tonal"
-  width="1000"
-  subtitle="LaTex embedded here showing sample epsilon and mu"
-></v-card>
+
+
+
+
+<v-card variant="tonal" style="border: none;" subtitle="asdfadsf">
+  <math-field read-only style="background-color: #232323; color: white; padding: 0; border: none;">
+    C = \begin{bmatrix}
+        \varepsilon & \zeta \\
+    \xi & \mu
+\end{bmatrix}
+  </math-field>
+</v-card>
+
 <v-card variant="tonal"
   width="1000"
   subtitle="A discussion on the differences between lossy and lossless media"

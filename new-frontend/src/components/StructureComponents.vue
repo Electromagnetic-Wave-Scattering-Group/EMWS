@@ -5,7 +5,7 @@ import { paramStore } from '@/store/emws'
 const structStore = paramStore()
 
 defineProps<{ msg: string }>()
-
+// number of layers to be inputted locally
 const num = ref(0);
 const dynamicStructureRef = ref();
 let readyToFinalize = ref(false)
@@ -20,8 +20,8 @@ const onBuildStruct = () => {
       name: 'layer ' + (i + 1),
       // length: Number, 
       length: i+2,
-      epsilon: Array.from({ length: 9 }, () => Math.random()), // Length 9 array
-      mu: Array.from({ length: 9 }, () => Math.random()),      // Length 9 array
+      epsilon: Array.from({ length: 9 }, () => 0), // Length 9 array
+      mu: Array.from({ length: 9 }, () => 0),      // Length 9 array
     };
     layerDataArray.push(layerData);
   }
@@ -45,6 +45,24 @@ const finalizeStruct = () => {
 
 </script>
 
+
+<!-- need dynamic data structure:
+
+for i in num: 
+  unique 3x3 epsilon (model on data store )
+  unique 3x3 mu  (model on data store )
+  scalar length (model on data store )
+
+
+then send to the store
+
+EMWS/new-frontend/src/store/emws.ts
+
+
+-->
+
+
+<!-- i think what you want is an interface -->
 <template>
   <v-container class="bg-surface-variant">
     Please Input The Number of Layers for the Experiment
@@ -61,6 +79,7 @@ const finalizeStruct = () => {
           </v-row>
             <v-row> 
               <v-text-field
+              
                 v-model="layer.length"
                 :label="`Layer ${index + 1} Length`"
                 type="number"
@@ -68,11 +87,13 @@ const finalizeStruct = () => {
             </v-row>
             <v-row v-for="i in 3" :key="i">
         <v-col v-for="j in 3" :key="j">
+          <!-- 3x3 array -->
           <v-text-field v-model="layer.epsilon[(i - 1) * 3 + j - 1]" :label="`Epsilon ${i}${j}`" type="number"></v-text-field>
         </v-col>
       </v-row>
       <v-row v-for="i in 3" :key="i">
         <v-col v-for="j in 3" :key="j">
+       <!-- 3x3 array -->
           <v-text-field v-model="layer.mu[(i - 1) * 3 + j - 1]" :label="`Mu ${i}${j}`" type="number"></v-text-field>
         </v-col>
       </v-row>

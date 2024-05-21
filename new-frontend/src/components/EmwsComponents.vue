@@ -7,7 +7,9 @@ const parameterStore = paramStore()
 
 defineProps<{ msg: string }>();
 
-const experiments = ref(['Scattering Experiment', 'Transmission Experiment', 'Faraday Roration'])
+
+
+const experiments = ref(['Scattering Experiment', 'Transmission Experiment', 'Faraday Rotation'])
 const experiment = ref('')
 const coeffecients = [1, 0, 0, 0]
 const frequencyStart = ref()
@@ -307,6 +309,71 @@ const transmissionSeries = computed(() => ([
     <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>
   </div>
 </v-container>
+
+
+
+<v-container class="bg-surface-variant" v-if="experiment == 'Faraday Rotation'">
+    <v-row no-gutters>
+    <v-col class="mr-4">
+      Please Input Parameters for the Signal
+        <v-form @submit.prevent>
+          <v-text-field
+            v-model="parameterStore.k1"
+            label="k1"
+            type="number"
+            >
+          </v-text-field>
+          <v-text-field
+            v-model="parameterStore.k2"
+            label="k2"
+            type="number">
+          </v-text-field>
+          <v-text-field
+            v-model="parameterStore.frequencyLeft"
+            label="wLeft"
+            type="number">
+          </v-text-field>
+          <v-text-field
+            v-model="parameterStore.frequencyRight"
+            label="wLeft"
+            type="number">
+          </v-text-field>
+          <v-text-field
+            v-model="parameterStore.points"
+            label="points"
+            type="number">
+          </v-text-field>
+      </v-form>
+    </v-col > 
+    <v-col class="ml-4">
+      Please Select Coeffecients
+      <v-row>
+        <v-col>
+          <v-text-field v-for="(coeff, index) in coeffecients.slice(0, 2)" :key="index"
+              v-model="parameterStore.transmissionCoeffecients[index]"
+              :label="`C ${index+1}`"
+              type="number"
+              >
+          </v-text-field>
+        </v-col>
+        <v-col>
+          <v-text-field v-for="(coeff, index) in coeffecients.slice(2,4)" :key="index"
+              v-model="parameterStore.transmissionCoeffecients[index+2]"
+              :label="`C ${index + 3}`"
+              type="number"
+              >
+          </v-text-field>
+        </v-col>
+      </v-row>
+      <v-btn block class="mt-2">Run Experiment</v-btn>
+    </v-col> 
+
+  </v-row>
+
+</v-container>
+
+
+
 
 <v-container class="bg-surface-variant" v-if="parameterStore.shouldRender, experiment=='Transmission Experiment'">
   <div id="chart">
