@@ -20,8 +20,8 @@ const onBuildStruct = () => {
       name: 'layer ' + (i + 1),
       // length: Number, 
       length: i+2,
-      epsilon: Array.from({ length: 9 }, () => 0), // Length 9 array
-      mu: Array.from({ length: 9 }, () => 0),      // Length 9 array
+      epsilon: Array.from({ length: 9 }, () => Math.random()), // Length 9 array
+      mu: Array.from({ length: 9 }, () => Math.random()),      // Length 9 array
     };
     layerDataArray.push(layerData);
   }
@@ -48,10 +48,11 @@ const finalizeStruct = () => {
 
 <!-- need dynamic data structure:
 
-for i in num: 
-  unique 3x3 epsilon (model on data store )
-  unique 3x3 mu  (model on data store )
-  scalar length (model on data store )
+< 
+  1. take "num" input and use it to determine number of layers for dynamic data structure 
+
+  2. Create dynamic data structure (see onBuildStruct)
+
 
 
 then send to the store

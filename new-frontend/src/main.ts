@@ -21,6 +21,9 @@ import { aliases, fa } from 'vuetify/iconsets/fa'
 import PrimeVue from 'primevue/config';
 import VueApexCharts from "vue3-apexcharts";
 
+import * as MathfieldElement from 'mathlive'
+
+
 
 
 
@@ -36,4 +39,4 @@ const vuetify = createVuetify({
   }
 }) 
 
-createApp(App).use(store).use(router).use(vuetify).use(PrimeVue).use(VueApexCharts).use(i18n).mount('#app')
+createApp(App).use(store).use(router).use(vuetify).use(PrimeVue).use(VueApexCharts).use(MathfieldElement).use(i18n).mount('#app')

@@ -132,15 +132,12 @@ export const paramStore = defineStore('params', () => {
 
 
   function buildStructure(num, data){
-    console.log('a;sdlokjasd;lfj;lasdjf;')
-    console.log(num)
-
+    // buildstruct uses dynamicdatastructure interface 
     const dynamicStructure: DynamicDataStructure<number> = {
       num: num,
       data: data,
     };
-    console.log('{}{}{}{}{')
-    console.log(dynamicStructure)
+
   }
 
   function buildStruct(layerNum: number, layerDataArray: Array<{ name: string, length: number, epsilon: number[]; mu: number[] }>):

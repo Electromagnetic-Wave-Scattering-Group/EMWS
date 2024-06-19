@@ -290,7 +290,6 @@ class Structure:
             eigVal, eigVec = np.linalg.eig(self.maxwell[n])
 
             if n == 0 or n == self.num - 1:
-
                 self.layers[n].eigVal, self.layers[n].eigVec = organizeEigen(eigVal, eigVec)
             else:
                 self.layers[n].eigVal, self.layers[n].eigVec = organizeEigenForMiddleLayers(eigVal, eigVec)

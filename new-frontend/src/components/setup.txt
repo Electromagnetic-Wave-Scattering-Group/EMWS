@@ -1,0 +1,23 @@
+This is an overview of how the Structure page works 
+ 
+
+
+
+On structureComponents page
+Numerical input for the number of layers 
+- v-model on "num" 
+- onBuildStruct puts "num" in a for loop 
+    - for ...
+        create (random) 3x3 epsilon, mu, and scalar length 
+        temporarily put this in layerDataArray 
+
+
+THEN we go through buildStruct (emws.ts file) 
+
+we then throw the data from layerDataArray into this state object  
+
+now we have "dynamicStructure" in state, this is where our problems really start 
+
+We want there to be a dynamic structure like "dynamicStructure" in this file so that the code can watch it
+
+For right now, all of the calculations are being done with this state.dynamicStructure object 
